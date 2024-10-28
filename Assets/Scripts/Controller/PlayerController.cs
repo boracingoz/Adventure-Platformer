@@ -12,6 +12,8 @@ namespace Controller
         [SerializeField] private float _moveSpeed;
         [SerializeField] private float _jumpForce;
         [SerializeField] private float _gravity = 10;
+        [SerializeField] private GameObject _playerMode;
+        [SerializeField] private float _rotateSpeed;
 
         private Vector3 _moveDirection;
         private CameraController _cameraController;
@@ -25,6 +27,7 @@ namespace Controller
         {
             float yStore = _moveDirection.y;
             _moveDirection = (transform.forward * Input.GetAxisRaw("Vertical")) + (transform.right * Input.GetAxisRaw("Horizontal"));
+            _moveDirection.Normalize();
            // _moveDirection = new Vector3(Input.GetAxisRaw("Horizontal"), 0, Input.GetAxisRaw("Vertical"));
             _moveDirection = _moveDirection * _moveSpeed;
             _moveDirection.y = yStore;
@@ -43,6 +46,10 @@ namespace Controller
             if (Input.GetAxisRaw("Horizontal") != 0 || Input.GetAxisRaw("Vertical") != 0)
             {
                 _cameraController.RotateWithPlayer(transform);
+                Quaternion newRotation = Quaternion.LookRotation(new Vector3(_moveDirection.x, 0, _moveDirection.z));
+                //_playerMode.transform.rotation = newRotation;
+
+                _playerMode.transform.rotation = Quaternion.Slerp(_playerMode.transform.rotation, newRotation, _rotateSpeed * Time.deltaTime);
             }
 
         }
