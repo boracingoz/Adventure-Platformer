@@ -2,37 +2,50 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class PlayerController : MonoBehaviour
+
+namespace Controller
 {
-    public CharacterController characterController;
-
-    [SerializeField] private float _moveSpeed;
-    [SerializeField] private float _jumpForce;
-    [SerializeField] private float _gravity = 10;
-    
-    private Vector3 _moveDirection;
-
-    private void Awake()
+    public class PlayerController : MonoBehaviour
     {
-    }
+        public CharacterController characterController;
 
-    // Update is called once per frame
-    void Update()
-    {
-        float yStore = _moveDirection.y;
-        _moveDirection = new Vector3(Input.GetAxisRaw("Horizontal"), 0 , Input.GetAxisRaw("Vertical"));
-        _moveDirection = _moveDirection * _moveSpeed;
-        _moveDirection.y = yStore;
+        [SerializeField] private float _moveSpeed;
+        [SerializeField] private float _jumpForce;
+        [SerializeField] private float _gravity = 10;
 
-        if (Input.GetButtonDown("Jump"))
+        private Vector3 _moveDirection;
+        private CameraController _cameraController;
+        private void Awake()
         {
-            _moveDirection.y = _jumpForce;
+            _cameraController = new CameraController(Camera.main.transform);
         }
 
-        _moveDirection.y += Physics.gravity.y * Time.deltaTime * _gravity;
+        // Update is called once per frame
+        void Update()
+        {
+            float yStore = _moveDirection.y;
+            _moveDirection = (transform.forward * Input.GetAxisRaw("Vertical")) + (transform.right * Input.GetAxisRaw("Horizontal"));
+           // _moveDirection = new Vector3(Input.GetAxisRaw("Horizontal"), 0, Input.GetAxisRaw("Vertical"));
+            _moveDirection = _moveDirection * _moveSpeed;
+            _moveDirection.y = yStore;
 
-        //transform.position = transform.position + (_moveDirection * Time.deltaTime * _moveSpeed);
+            if (Input.GetButtonDown("Jump"))
+            {
+                _moveDirection.y = _jumpForce;
+            }
 
-        characterController.Move(_moveDirection * Time.deltaTime);
+            _moveDirection.y += Physics.gravity.y * Time.deltaTime * _gravity;
+
+            //transform.position = transform.position + (_moveDirection * Time.deltaTime * _moveSpeed);
+
+            characterController.Move(_moveDirection * Time.deltaTime);
+
+            if (Input.GetAxisRaw("Horizontal") != 0 || Input.GetAxisRaw("Vertical") != 0)
+            {
+                _cameraController.RotateWithPlayer(transform);
+            }
+
+        }
     }
+
 }
