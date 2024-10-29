@@ -12,8 +12,9 @@ namespace Controller
         [SerializeField] private float _moveSpeed;
         [SerializeField] private float _jumpForce;
         [SerializeField] private float _gravity = 10;
-        [SerializeField] private GameObject _playerMode;
+        [SerializeField] private GameObject _playerModel;
         [SerializeField] private float _rotateSpeed;
+        [SerializeField] private Animator _animator;
 
         private Vector3 _moveDirection;
         private CameraController _cameraController;
@@ -49,9 +50,11 @@ namespace Controller
                 Quaternion newRotation = Quaternion.LookRotation(new Vector3(_moveDirection.x, 0, _moveDirection.z));
                 //_playerMode.transform.rotation = newRotation;
 
-                _playerMode.transform.rotation = Quaternion.Slerp(_playerMode.transform.rotation, newRotation, _rotateSpeed * Time.deltaTime);
+                _playerModel.transform.rotation = Quaternion.Slerp(_playerModel.transform.rotation, newRotation, _rotateSpeed * Time.deltaTime);
             }
 
+            _animator.SetFloat("Speed", Mathf.Abs(_moveDirection.x) + Mathf.Abs(_moveDirection.z));
+            _animator.SetBool("Grounded", characterController.isGrounded);
         }
     }
 
